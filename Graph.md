@@ -1,4 +1,4 @@
-# GRAPH
+# Graph
 
 ---
 | Graph |
