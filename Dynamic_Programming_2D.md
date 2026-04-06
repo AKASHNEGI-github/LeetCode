@@ -286,7 +286,7 @@ public:
 ```c++
 class Solution {
 public:
-    int minPathSum(vector<vector<int>>& grid) 
+    int minPathSum(vector<vector<int>>& grid) // Tabulation
     {    
         int row = grid.size();
         int col = grid[0].size();
@@ -302,6 +302,7 @@ public:
         {
             matrix[0][j] = grid[0][j] + matrix[0][j-1];
         }
+        // Calculate Matrix
         for(int i=1; i<row; i++)
         {
             for(int j=1; j<col; j++)
@@ -347,6 +348,7 @@ public:
         }
         return {minValue, maxValue};
     }
+
     int maxProductPath(vector<vector<int>>& grid) 
     {    
         auto [minProduct, maxProduct] = maxProductPathRecursion(grid, 0, 0);
@@ -398,6 +400,7 @@ public:
         matrix[i][j] = {minValue, maxValue};
         return matrix[i][j];
     }
+
     int maxProductPath(vector<vector<int>>& grid) 
     {    
         int row = grid.size();
@@ -414,5 +417,47 @@ public:
 ```
 
 ```c++
+class Solution {
+public:
+    int modulo = 1e9 + 7;
 
+    int maxProductPath(vector<vector<int>>& grid) // Tabulation
+    {    
+        int row = grid.size();
+        int col = grid[0].size();
+        vector<vector<pair<long long, long long>>> matrix(row, vector<pair<long long, long long>>(col));
+        matrix[0][0] = {grid[0][0], grid[0][0]};
+        // calculate First Row
+        for(int j=1; j<col; j++)
+        {
+            matrix[0][j].first = grid[0][j] * matrix[0][j-1].first; // minValue
+            matrix[0][j].second = grid[0][j] * matrix[0][j-1].second; // maxValue
+        }
+        // calculate First Row
+        for(int i=1; i<row; i++)
+        {
+            matrix[i][0].first = grid[i][0] * matrix[i-1][0].first; // minValue
+            matrix[i][0].second = grid[i][0] * matrix[i-1][0].second; // maxValue
+        }
+        // calculate Matrix
+        for(int i=1; i<row; i++)
+        {
+            for(int j=1; j<col; j++)
+            {
+                long long minUp = matrix[i-1][j].first;
+                long long maxUp = matrix[i-1][j].second;
+                long long minLeft = matrix[i][j-1].first;
+                long long maxLeft = matrix[i][j-1].second;
+                matrix[i][j].first = min({grid[i][j] * minUp, grid[i][j] * maxUp, grid[i][j] * minLeft, grid[i][j] * maxLeft});
+                matrix[i][j].second = max({grid[i][j] * minUp, grid[i][j] * maxUp, grid[i][j] * minLeft, grid[i][j] * maxLeft});
+            }
+        }
+        auto [minProduct, maxProduct] = matrix[row-1][col-1];
+        if(maxProduct >= 0)
+        {
+            return (maxProduct % modulo);
+        }
+        return -1;
+    }
+};
 ```
