@@ -360,7 +360,57 @@ public:
 ```
 
 ```c++
+class Solution {
+public:
+    int modulo = 1e9 + 7;
 
+    pair<long long, long long> maxProductPathMemoization(vector<vector<int>>& grid, int i, int j, vector<vector<pair<long long, long long>>>& matrix)
+    {
+        int row = grid.size();
+        int col = grid[0].size();
+        long long minValue = LLONG_MAX;
+        long long maxValue = LLONG_MIN;
+        // Base case
+        if(i == row-1 && j == col-1)
+        {
+            return {grid[i][j], grid[i][j]};
+        }
+        // Already Calculated
+        if(matrix[i][j] != make_pair(LLONG_MAX, LLONG_MIN))
+        {
+            return matrix[i][j];
+        }
+        // Move Right
+        if(j+1 < col)
+        {
+            auto [minRight, maxRight] = maxProductPathMemoization(grid, i, j+1, matrix);
+            minValue = min({minValue, grid[i][j] * maxRight, grid[i][j] * minRight});
+            maxValue = max({maxValue, grid[i][j] * maxRight, grid[i][j] * minRight});
+        }
+        // Move Down
+        if(i+1 < row)
+        {
+            auto [minDown, maxDown] = maxProductPathMemoization(grid, i+1, j, matrix);
+            minValue = min({minValue, grid[i][j] * maxDown, grid[i][j] * minDown});
+            maxValue = max({maxValue, grid[i][j] * maxDown, grid[i][j] * minDown});
+        }
+        // Store Result
+        matrix[i][j] = {minValue, maxValue};
+        return matrix[i][j];
+    }
+    int maxProductPath(vector<vector<int>>& grid) 
+    {    
+        int row = grid.size();
+        int col = grid[0].size();
+        vector<vector<pair<long long, long long>>> matrix(row, vector<pair<long long, long long>>(col, {LLONG_MAX, LLONG_MIN}));
+        auto [minProduct, maxProduct] = maxProductPathMemoization(grid, 0, 0, matrix);
+        if(maxProduct >= 0)
+        {
+            return (maxProduct % modulo);
+        }
+        return -1;
+    }
+};
 ```
 
 ```c++
